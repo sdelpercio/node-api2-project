@@ -36,4 +36,26 @@ router.get('/:id', (req, res) => {
 		});
 });
 
+// POST a new blog post
+router.post('/', (req, res) => {
+	if (!req.body.title || !req.body.contents) {
+		res
+			.status(400)
+			.json({ error: 'Please provide title and contents for the post' });
+	} else {
+		db.insert(req.body)
+			.then(postID => {
+				res.status(201).json(postID);
+			})
+			.catch(error => {
+				console.log('post blog post error', error);
+				res
+					.status(500)
+					.json({
+						error: 'There was an error while saving the post to the database'
+					});
+			});
+	}
+});
+
 module.exports = router;
