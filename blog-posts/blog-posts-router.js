@@ -102,4 +102,51 @@ router.post('/:id/comments', (req, res) => {
 	}
 });
 
+// UPDATE a blog post
+router.put('/:id', (req, res) => {
+	if (!req.body.title || !req.body.contents) {
+		res
+			.status(400)
+			.json({ error: 'Please provide title and contents for the post.' });
+	} else {
+		db.update(req.params.id, req.body)
+			.then(() => {
+				db.findById(req.params.id)
+					.then(post => {
+						res.status(200).json(post);
+					})
+					.catch(error => {
+						res
+							.status(500)
+							.json({ error: 'The updated post could not be found', err });
+					});
+			})
+			.catch(error => {
+				console.log('error from update post', error);
+				res
+					.status(500)
+					.json({ error: 'The post information could not be modified' });
+			});
+	}
+});
+
+// DELETE a blog post
+router.delete('/:id', (req, res) => {
+	db.find(req.params.id)
+		.then()
+		.catch(error => {
+			res
+				.status(404)
+				.json({ error: 'The post with the specified ID does not exist.' });
+		});
+	db.remove(req.params.id)
+		.then(removedPost => {
+			res.status(200).json(removedPost);
+		})
+		.catch(error => {
+			console.log('error from removing post', error);
+			res.status(500).json({ error: 'The post could not be removed.' });
+		});
+});
+
 module.exports = router;
