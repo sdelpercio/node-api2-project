@@ -37,6 +37,30 @@ router.get('/:id', (req, res) => {
 		});
 });
 
+// GET all comments for a blog post
+router.get('/:id/comments', (req, res) => {
+	if (!req.params.id) {
+		res.status(400).json({ error: 'please include an id in the URL' });
+	} else {
+		db.findPostComments(req.params.id)
+			.then(comments => {
+				if (!comments) {
+					res
+						.status(404)
+						.json({ error: 'The post with the specified ID does not exist.' });
+				} else {
+					res.status(200).json(comments);
+				}
+			})
+			.catch(error => {
+				console.log('error for blog post comments', error);
+				res
+					.status(500)
+					.json({ error: 'The comments information could not be retrieved.' });
+			});
+	}
+});
+
 // POST a new blog post
 router.post('/', (req, res) => {
 	if (!req.body.title || !req.body.contents) {
