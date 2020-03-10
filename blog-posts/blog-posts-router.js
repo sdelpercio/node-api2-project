@@ -132,20 +132,21 @@ router.put('/:id', (req, res) => {
 
 // DELETE a blog post
 router.delete('/:id', (req, res) => {
-	db.find(req.params.id)
-		.then()
+	db.findById(req.params.id)
+		.then(selectedPost => {
+			db.remove(req.params.id)
+				.then(() => {
+					res.status(200).json(selectedPost);
+				})
+				.catch(error => {
+					console.log('error from removing post', error);
+					res.status(500).json({ error: 'The post could not be removed.' });
+				});
+		})
 		.catch(error => {
 			res
 				.status(404)
 				.json({ error: 'The post with the specified ID does not exist.' });
-		});
-	db.remove(req.params.id)
-		.then(removedPost => {
-			res.status(200).json(removedPost);
-		})
-		.catch(error => {
-			console.log('error from removing post', error);
-			res.status(500).json({ error: 'The post could not be removed.' });
 		});
 });
 
